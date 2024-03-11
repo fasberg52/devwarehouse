@@ -1,0 +1,9 @@
+###
+POST http:localhost:3000/auth/signup
+Content-Type: application/json
+
+{
+    "mobile":"09218913541",
+    "password":"1234asd",
+    "name":"asd"
+}
