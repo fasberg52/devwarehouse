@@ -2,7 +2,7 @@
   "development": {
     "username": "root",
     "password": "2434127reza",
-    "database": "warehouse",
+    "database": "friendly_edison",
     "host": "localhost",
     "dialect": "mysql",
     "JWT_SECRET": "1234",

@@ -3,12 +3,12 @@ const { Sequelize } = require("sequelize");
 const { applyExtraSetup } = require("./models/extra-setup.js");
 
 const sequelize = new Sequelize({
-  dialect: config.development.dialect, // Use the dialect of your database (e.g., 'mysql', 'postgres', 'sqlite', etc.)
-  host: config.development.host, // Replace with your database host
-  username: config.development.username, // Replace with your database username
-  password: config.development.password, // Replace with your database password
-  database: config.development.database, // Replace with your database name
-  port: config.development.port, // Replace with your database port (default is 3306 for MySQL)
+  dialect: config.production.dialect, // Use the dialect of your database (e.g., 'mysql', 'postgres', 'sqlite', etc.)
+  host: config.production.host, // Replace with your database host
+  username: config.production.username, // Replace with your database username
+  password: config.production.password, // Replace with your database password
+  database: config.production.database, // Replace with your database name
+  port: config.production.port, // Replace with your database port (default is 3306 for MySQL)
   pool: {
     max: 5,
     min: 0,

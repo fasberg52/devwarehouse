@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  jwt.verify(token, config.development.JWT_SECRET, (err, user) => {
+  jwt.verify(token, config.production.JWT_SECRET, (err, user) => {
     if (err) {
       return res.status(401).json({ error: err });
     }

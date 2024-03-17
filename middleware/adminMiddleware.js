@@ -16,7 +16,7 @@ async function adminMiddelware(req, res, next) {
     res.status(400).json("not admin");
   }
   if (findAdmin.role && findAdmin.role === "admin") {
-    jwt.verify(findAdmin.token, config.development.JWT_SECRET, (err, dec) => {
+    jwt.verify(findAdmin.token, config.production.JWT_SECRET, (err, dec) => {
       isAdmin(dec);
     });
   } else {

@@ -50,7 +50,7 @@ module.exports = {
           // create json web token and send it back to client side
           const token = jwt.sign(
             { mobile: mobile },
-            config.development.JWT_SECRET,
+            config.production.JWT_SECRET,
             { expiresIn: "1d" }
           );
           newUser.token = token;
@@ -93,7 +93,7 @@ module.exports = {
 
       const token = jwt.sign(
         { userId: user.id, mobile: mobile },
-        config.development.JWT_SECRET,
+        config.production.JWT_SECRET,
         { expiresIn: "1d" }
       );
       user.token = token;
