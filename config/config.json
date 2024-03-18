@@ -20,7 +20,9 @@
     "username": "root",
     "password": "rIICvVO2CppyMFIE8H9p2bwX",
     "database": "loving_moore",
-    "host": "himalayas.liara.cloud",
-    "dialect": "mysql"
+    "host": "warehousedb",
+    "dialect": "mysql",
+    "app": "nodejs",
+    "port": 3306
   }
 }
