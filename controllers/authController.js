@@ -11,84 +11,70 @@ module.exports = {
   async register(req, res) {
     try {
       const { password, name, mobile } = req.body;
-      // Check user enters all fields
-      if (!password)
+
+      if (!password || !name || !mobile) {
+        return res.status(400).json({ message: "پارامترهای ارسالی صحیح نیست" });
+      }
+      console.log(mobile);
+     
+      const existingUser = await models.User.findOne({
+        where: { mobile: mobile },
+      });
+      console.log(JSON.stringify(existingUser));
+      if (existingUser) {
         return res
           .status(400)
-          .json({ message: "Please provide email and password" });
-      // Check the user enters the right formatted email
-      const reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-      // if (reg.test(email) === false) return res.status(400).json({ message: "Incorrect email format" });
-      // Check user password length is more than 8 character
+          .json({ message: "شماره همراه شما قبل ثبت شده است" });
+      }
 
-      // create new User object to be saved in Database
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Check if user already exist
-      const user = await models.User.findOne({ where: { name: name } });
-      if (user)
-        return res
-          .status(400)
-          .json({ message: "Email already registered. Please Login" });
+      // Create a new user
       const newUser = await models.User.create({
-        password: password,
         name: name,
         mobile: mobile,
+        password: hashedPassword,
       });
 
-      let { role } = newUser;
-      // Generate Password Hash
-      bcrypt.genSalt(10, (err, salt) => {
-        if (err) throw err;
-        bcrypt.hash(password, salt, async (err, hash) => {
-          if (err) throw err;
-          // Add hashed password to new user object
-          newUser.password = hash;
-          //Save user to DB
-          req.body.role
-            ? (newUser.role = req.body.role)
-            : (newUser.role = role);
-          // create json web token and send it back to client side
-          const token = jwt.sign(
-            { mobile: mobile },
-            config.production.JWT_SECRET,
-            { expiresIn: "1d" }
-          );
-          newUser.token = token;
-          await newUser.save();
-          res.json({
-            newUser: newUser,
-          });
-        });
+      // Generate JWT token
+      const token = jwt.sign({ mobile: mobile }, config.production.JWT_SECRET, {
+        expiresIn: "1d",
+      });
+
+      // Update user with token
+      newUser.token = token;
+      await newUser.save();
+
+      res.json({
+        newUser: newUser,
       });
     } catch (err) {
-      throw err;
+      console.error(`Error in registration: ${err}`);
+      res.status(500).json({ message: "خطای سرور" });
     }
   },
-
   async login(req, res) {
     try {
       const { mobile, password } = req.body;
 
-      // Check user enters all fields
-      if (!mobile || !password)
-        res
+      if (!mobile || !password) {
+        return res
           .status(400)
           .json({ message: "لطفا نام کاربری و رمز عبور را وارد نمایید" });
-      // Check for correct mobile
+      }
+
       const user = await models.User.findOne({ where: { mobile: mobile } });
-      console.log(user);
-      // if mobile not found
-      if (!user)
-        res
+
+      if (!user) {
+        return res
           .status(400)
           .json({ message: "لطفا نام کاربری و رمز عبور را بررسی نمایید" });
-      // if mobile found compare hashed password with incoming password
-
-      // console.log({mobile})
+      }
 
       const match = await bcrypt.compare(password, user.password);
       if (!match) {
-        res.status(400).json("پسورد درست نیست");
+        return res.status(400).json({ message: "پسورد درست نیست" });
       }
 
       const token = jwt.sign(
@@ -96,15 +82,19 @@ module.exports = {
         config.production.JWT_SECRET,
         { expiresIn: "1d" }
       );
+
       user.token = token;
-      user.save();
-      res.send({
+      await user.save();
+
+      res.json({
         user: user,
       });
     } catch (err) {
-      console.log(err);
+      console.error(`error in login: ${err}`);
+      res.status(500).json({ message: "خطای سرور" });
     }
   },
+
   // get user information
   async getUser(req, res) {
     try {
